@@ -1,37 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <style>
+
+        body {
+            background-color: #333333;
+        }
+
+        .left-pane {
+            margin: 0px;
+        }
+
+        .right-pane {
+            margin: 0px;
+        }
+
+        .top-div {
+            margin: 20px;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        label {
+            color: white;
+        }
+
+        /* Full-width input fields */
+        input[type=text],
+        input[type=password] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        /* Set a style for all buttons */
+        button {
+            background-color: #04AA6D;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        /* Extra styles for the cancel button */
+        .cancelbtn {
+            width: auto;
+            padding: 10px 18px;
+            background-color: #f44336;
+        }
+
+        .cancelbtn-left {
+            width: 100%;
+            margin-left: 10px;
+            margin-right: 10px;
+            background-color: #f44336;
+        }
+
+        /* Center the image and position the close button */
+        .imgcontainer {
+            text-align: center;
+            margin: 24px 0 12px 0;
+            position: relative;
+        }
+
+        img.avatar {
+            width: 40%;
+            border-radius: 50%;
+        }
+
+        .container-login-div {
+            padding: 16px;
+        }
+
+        span.psw {
+            float: right;
+            padding-top: 16px;
+        }
+
+        span.psw-left {
+            float: left;
+            padding-top: 16px;
+        }
+
+        /* The Modal (background) */
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 1;
+            /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgb(0, 0, 0);
+            /* Fallback color */
+            background-color: rgba(0, 0, 0, 0.4);
+            /* Black w/ opacity */
+            padding-top: 60px;
+        }
+
+        /* Modal Content/Box */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto 15% auto;
+            /* 5% from the top, 15% from the bottom and centered */
+            border: 1px solid #888;
+            width: 80%;
+            /* Could be more or less, depending on screen size */
+        }
+
+        /* The Close Button (x) */
+        .close {
+            position: absolute;
+            right: 25px;
+            top: 0;
+            color: #000;
+            font-size: 35px;
+            font-weight: bold;
+        }
+
+        .full-width {
+            width: 100%;
+        }
+    </style>
+
 </head>
+
 <body>
-    <label>Div1</label>
-    <div>
-        <span>User name</span>
-        <input type="text">
-        <input/>
-    </div>
-    <div>
-        <span>User name</span>
-        <input type="text">
-        <input>
-    </div>
-    <div>
-        <span>User name</span>
-        <input type="text">
-        <input>
-    </div>
-    <div>
-        <span>User name</span>
-        <input type="text">
-        <input>
-    </div>
+
+    <div class="container-fluid">
+        <div class="top-div">
+
+        </div>
         <div>
-        <span>User name</span>
-        <input type="text">
-        <input>
+            <button type="button" class="cancelbtn full-width" onclick="changeView()">Change View</button>
+        </div>
     </div>
+
+    <script>
+        var view = false;
+
+        function changeView() {
+
+
+            if (view) {
+                html = "<div class='row row-no-gutters'>";
+                html += "<div class='col-sm-4 right-pane'>";
+                html += "<form action='action_page.php' method='post'>";
+                html += "<div class='imgcontainer'>";
+                html += "<img src='img_avatar2.png' alt='Avatar' class='avatar'>";
+                html += "</div>";
+                html += "<div class='container-login-div'>";
+                html += " <label for='uname'><b>Username</b></label>";
+                html += "<input type='text' placeholder='Enter Username' name='uname' required>";
+                html += "<label for='psw'><b>Password</b></label>";
+                html += "<input type='password' placeholder='Enter Password' name='psw' required>";
+                html += "<label>";
+                html += " <input type='checkbox' checked='checked' name='remember'> Remember me";
+                html += "</label>";
+                html += "<div class='full-width'>"
+                html += "<div class='col-sm-6'>";
+                html += "<button type='submit'>Login</button>";
+                html += " </div>";
+                html += "<div class='col-sm-6'>";
+                html += "<button type='button' class='cancelbtn-left'>Cancel</button>"
+                html += " </div>";
+                html += " </div>";
+                html += " </div>";
+                html += "<div class='container-login-div' >";
+                html += " ";
+                html += "<span class='psw-left'><a href='#'>Forgot password?</a></span>";
+                html += " </div>";
+                html += "</form>";
+                html += " </div>";
+                html += "<div class='col-sm-8 left-pane'>";
+                html += "<img src='122.png' >";
+                html += "</div>";
+                html += "</div>";
+                $(".top-div").html(html);
+                view = false;
+            } else {
+                html = "<div class='row row-no-gutters'>";
+                html += "<div class='col-sm-8 left-pane'>";
+                html += "<img src='122.png' >";
+                html += "</div>";
+                html += "<div class='col-sm-4 right-pane'>";
+                html += "<form action='action_page.php' method='post'>";
+                html += "<div class='imgcontainer'>";
+                html += "<img src='img_avatar2.png' alt='Avatar' class='avatar'>";
+                html += "</div>";
+                html += "<div class='container-login-div'>";
+                html += " <label for='uname'><b>Username</b></label>";
+                html += "<input type='text' placeholder='Enter Username' name='uname' required>";
+                html += "<label for='psw'><b>Password</b></label>";
+                html += "<input type='password' placeholder='Enter Password' name='psw' required>";
+                html += "<button type='submit'>Login</button>";
+                html += "<label>";
+                html += " <input type='checkbox' checked='checked' name='remember'> Remember me";
+                html += "</label>";
+                html += " </div>";
+                html += "<div class='container-login-div' >";
+                html += " <button type='button' class='cancelbtn'>Cancel</button>";
+                html += "<span class='psw'><a href='#'>Forgot password?</a></span>";
+                html += " </div>";
+                html += "</form>";
+                html += " </div>";
+                html += "</div>";
+                $(".top-div").html(html);
+                view = true;
+            }
+        }
+
+        changeView();
+    </script>
+
 </body>
+
 </html>
