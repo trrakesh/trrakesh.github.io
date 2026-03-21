@@ -3,6 +3,7 @@
 This project contains:
 - A frontend page showing gold and silver rates.
 - An AWS Lambda proxy with CORS.
+- An API endpoint that returns date-wise historical data from S3.
 - Deployment scripts for:
   - Lambda Function URL
   - API Gateway HTTP API
@@ -14,6 +15,7 @@ This project contains:
 - `config.js` - frontend endpoint config (auto-updated by deploy scripts)
 - `lambda/gold-rates-proxy/index.mjs` - Lambda handler
 - `lambda/gold-rates-archiver/index.mjs` - Daily S3 archiver Lambda handler
+- `lambda/gold-rates-history/index.mjs` - S3 history reader Lambda handler
 - `template.yaml` - SAM template for both Lambda functions + S3 + schedule
 - `scripts/deploy_lambda.sh` - deploy using Lambda Function URL
 - `scripts/deploy_apigw_http_api.sh` - deploy using API Gateway HTTP API
@@ -68,8 +70,9 @@ Then open:
 
 ## Deploy with AWS SAM (Both Lambdas)
 This deploys:
-- `GoldRatesProxyFunction` (CORS-enabled Lambda Function URL)
+- `GoldRatesProxyFunction` (current day rates API)
 - `GoldRatesArchiverFunction` (runs every day at 12 PM)
+- `GoldRatesHistoryFunction` (date-wise history API from S3)
 - S3 bucket for daily JSON snapshots
 
 Quick deploy using script:
@@ -124,7 +127,9 @@ sam deploy \
 Notes:
 - The daily trigger is set in `template.yaml` as `cron(0 12 * * ? *)` and uses `ScheduleTimezone`.
 - A fixed key is overwritten daily for chart apps: `gold-rates/latest.json`.
-- Optional history is also kept as `gold-rates/YYYY-MM-DD.json` (toggle with `StoreDailySnapshot`).
+- Default mode keeps only one file (`StoreDailySnapshot=false`).
+- Optional history can be enabled as `gold-rates/YYYY-MM-DD.json` (set `StoreDailySnapshot=true`).
+- History API endpoint: `/default/gold-history?limit=30`
 
 Example deploy to keep only one rolling JSON file (no history):
 

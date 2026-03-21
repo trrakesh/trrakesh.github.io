@@ -33,6 +33,16 @@
         <div id="status" class="status" role="status" aria-live="polite">Loading latest rates...</div>
         <div id="ratesGrid" class="rates-grid" aria-live="polite"></div>
       </section>
+
+      <section class="chart-wrap" aria-labelledby="historyTitle">
+        <div class="chart-head">
+          <h2 id="historyTitle">Daily Price Trend</h2>
+          <p id="chartStatus" class="chart-status">Loading chart data...</p>
+        </div>
+        <div class="chart-card">
+          <canvas id="historyChart" aria-label="Daily gold and silver price chart" role="img"></canvas>
+        </div>
+      </section>
     </main>
 
     <template id="rateCardTemplate">
@@ -47,6 +57,7 @@
     </template>
 
     <script src="config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

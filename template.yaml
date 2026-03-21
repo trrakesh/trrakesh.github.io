@@ -17,7 +17,7 @@ Parameters:
     Description: Fixed S3 key overwritten on each daily run
   StoreDailySnapshot:
     Type: String
-    Default: "true"
+    Default: "false"
     AllowedValues:
       - "true"
       - "false"
@@ -98,6 +98,31 @@ Resources:
             Name: gold-rates-daily-noon
             Description: Runs every day at 12 PM and saves gold-rate JSON to S3
 
+  GoldRatesHistoryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/gold-rates-history/
+      Handler: index.handler
+      Runtime: nodejs20.x
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref GoldRatesArchiveBucket
+          PREFIX: !Ref ArchivePrefix
+          LATEST_OBJECT_KEY: !Ref LatestObjectKey
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - S3ReadPolicy:
+            BucketName: !Ref GoldRatesArchiveBucket
+      Events:
+        GoldHistoryApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref GoldRatesHttpApi
+            Path: /gold-history
+            Method: GET
+
 Outputs:
   GoldRatesProxyFunctionArn:
     Description: ARN of proxy Lambda function
@@ -111,6 +136,10 @@ Outputs:
     Description: ARN of daily archiver Lambda function
     Value: !GetAtt GoldRatesArchiverFunction.Arn
 
+  GoldRatesHistoryFunctionArn:
+    Description: ARN of history Lambda function
+    Value: !GetAtt GoldRatesHistoryFunction.Arn
+
   GoldRatesArchiveBucketName:
     Description: S3 bucket that stores daily JSON snapshots
     Value: !Ref GoldRatesArchiveBucket
@@ -118,3 +147,7 @@ Outputs:
   GoldRatesLatestObjectKey:
     Description: S3 key overwritten daily with latest JSON payload
     Value: !Ref LatestObjectKey
+
+  GoldRatesHistoryApiUrl:
+    Description: Public API endpoint for historical data
+    Value: !Sub https://${GoldRatesHttpApi}.execute-api.${AWS::Region}.amazonaws.com/default/gold-history
