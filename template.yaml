@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Gold rates proxy and daily S3 archiver Lambdas
+
+Parameters:
+  ScheduleTimezone:
+    Type: String
+    Default: Asia/Kolkata
+    Description: Timezone for daily schedule trigger
+  ArchivePrefix:
+    Type: String
+    Default: gold-rates
+    Description: S3 object key prefix for archived JSON files
+  LatestObjectKey:
+    Type: String
+    Default: gold-rates/latest.json
+    Description: Fixed S3 key overwritten on each daily run
+  StoreDailySnapshot:
+    Type: String
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: If true, also writes dated snapshot JSON files
+
+Resources:
+  GoldRatesArchiveBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+
+  GoldRatesHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: default
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowMethods:
+          - GET
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+
+  GoldRatesProxyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/gold-rates-proxy/
+      Handler: index.handler
+      Runtime: nodejs20.x
+      MemorySize: 128
+      Timeout: 10
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        GoldRateApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref GoldRatesHttpApi
+            Path: /gold-rete
+            Method: GET
+
+  GoldRatesArchiverFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/gold-rates-archiver/
+      Handler: index.handler
+      Runtime: nodejs20.x
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          TARGET_URL: https://appdata.manoramaonline.com/common/MMOnlineVipani/gold/goldRate.json
+          BUCKET_NAME: !Ref GoldRatesArchiveBucket
+          PREFIX: !Ref ArchivePrefix
+          LATEST_OBJECT_KEY: !Ref LatestObjectKey
+          STORE_DAILY_SNAPSHOT: !Ref StoreDailySnapshot
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - S3WritePolicy:
+            BucketName: !Ref GoldRatesArchiveBucket
+      Events:
+        DailyAtNoon:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0 12 * * ? *)
+            ScheduleExpressionTimezone: !Ref ScheduleTimezone
+            Name: gold-rates-daily-noon
+            Description: Runs every day at 12 PM and saves gold-rate JSON to S3
+
+Outputs:
+  GoldRatesProxyFunctionArn:
+    Description: ARN of proxy Lambda function
+    Value: !GetAtt GoldRatesProxyFunction.Arn
+
+  GoldRatesHttpApiUrl:
+    Description: Public API endpoint for the proxy
+    Value: !Sub https://${GoldRatesHttpApi}.execute-api.${AWS::Region}.amazonaws.com/default/gold-rete
+
+  GoldRatesArchiverFunctionArn:
+    Description: ARN of daily archiver Lambda function
+    Value: !GetAtt GoldRatesArchiverFunction.Arn
+
+  GoldRatesArchiveBucketName:
+    Description: S3 bucket that stores daily JSON snapshots
+    Value: !Ref GoldRatesArchiveBucket
+
+  GoldRatesLatestObjectKey:
+    Description: S3 key overwritten daily with latest JSON payload
+    Value: !Ref LatestObjectKey
