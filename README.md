@@ -127,7 +127,7 @@ sam deploy \
 Notes:
 - The daily trigger is set in `template.yaml` as `cron(0 12 * * ? *)` and uses `ScheduleTimezone`.
 - A fixed key is overwritten daily for chart apps: `gold-rates/latest.json`.
-- Default mode keeps only one file (`StoreDailySnapshot=false`).
+- Default mode keeps only one file (`StoreDailySnapshot=false`) and appends each day into `series` inside that same JSON.
 - Optional history can be enabled as `gold-rates/YYYY-MM-DD.json` (set `StoreDailySnapshot=true`).
 - History API endpoint: `/default/gold-history?limit=30`
 

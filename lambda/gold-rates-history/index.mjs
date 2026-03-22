@@ -29,6 +29,17 @@ function parseNumber(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function pointFromPayload(payload) {
+  const details = payload?.details?.[0] || {};
+  return {
+    date: details.date || payload?.date || new Date().toISOString().slice(0, 10),
+    gold24K: parseNumber(details.gold24K),
+    gold22K: parseNumber(details.gold22K),
+    gold18K: parseNumber(details.gold18K),
+    silver: parseNumber(details.silver),
+  };
+}
+
 async function readJsonObject(key) {
   const object = await s3.send(
     new GetObjectCommand({
@@ -62,18 +73,27 @@ export const handler = async (event) => {
 
   try {
     const data = await readJsonObject(LATEST_OBJECT_KEY);
-    const details = data?.details?.[0] || {};
-    const date = details.date || data?.date || new Date().toISOString().slice(0, 10);
+    let series = [];
 
-    const series = [
-      {
-        date,
-        gold24K: parseNumber(details.gold24K),
-        gold22K: parseNumber(details.gold22K),
-        gold18K: parseNumber(details.gold18K),
-        silver: parseNumber(details.silver),
-      },
-    ];
+    if (Array.isArray(data?.series)) {
+      series = data.series
+        .filter((item) => item?.date)
+        .map((item) => ({
+          date: item.date,
+          gold24K: parseNumber(item.gold24K),
+          gold22K: parseNumber(item.gold22K),
+          gold18K: parseNumber(item.gold18K),
+          silver: parseNumber(item.silver),
+        }));
+    } else {
+      series = [pointFromPayload(data)];
+    }
+
+    const limitRaw = event?.queryStringParameters?.limit;
+    const limit = Number.parseInt(limitRaw || "0", 10);
+    if (limit > 0) {
+      series = series.slice(-limit);
+    }
 
     return response(200, {
       bucket: BUCKET_NAME,

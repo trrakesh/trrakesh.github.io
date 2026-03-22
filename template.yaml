@@ -87,6 +87,8 @@ Resources:
           STORE_DAILY_SNAPSHOT: !Ref StoreDailySnapshot
       Policies:
         - AWSLambdaBasicExecutionRole
+        - S3ReadPolicy:
+            BucketName: !Ref GoldRatesArchiveBucket
         - S3WritePolicy:
             BucketName: !Ref GoldRatesArchiveBucket
       Events:
