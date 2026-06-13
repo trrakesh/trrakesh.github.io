@@ -8677,12 +8677,13 @@ $382e02c9bbd5d50b$var$lblFlashSize.style.display = "none";
  * File reader handler to read given local file.
  * @param {Event} evt File Select event
  */ function $382e02c9bbd5d50b$var$handleFileSelect(evt) {
-    const file = evt.target.files[0];
+    const fileInput = evt.target;
+    const file = fileInput.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev)=>{
-        if (ev.target.result instanceof ArrayBuffer) evt.target.data = new Uint8Array(ev.target.result);
-        else evt.target.data = ev.target.result;
+        const data = ev.target.result;
+        fileInput.data = data instanceof ArrayBuffer ? new Uint8Array(data) : data;
     };
     reader.readAsArrayBuffer(file);
 }
@@ -9051,9 +9052,13 @@ $382e02c9bbd5d50b$var$consoleStopButton.onclick = async ()=>{
         if (Number.isNaN(offset)) return "Offset field in row " + index + " is not a valid address!";
         else if (offsetArr.includes(offset)) return "Offset field in row " + index + " is already in use!";
         else offsetArr.push(offset);
-        const fileObj = row.cells[1].childNodes[0];
+        const fileObj = row.cells[1].querySelector('input[type=file]');
+        if (!fileObj) return "No file selector found for row " + index + "!";
         fileData = fileObj.data;
-        if (fileData == null) return "No file selected for row " + index + "!";
+        if (fileData == null) {
+            if (fileObj.files && fileObj.files.length > 0) return "Selected file for row " + index + " is still loading!";
+            return "No file selected for row " + index + "!";
+        }
     }
     return "success";
 }
@@ -9073,8 +9078,9 @@ $382e02c9bbd5d50b$var$programButton.onclick = async ()=>{
         const row = $382e02c9bbd5d50b$var$table.rows[index];
         const offSetObj = row.cells[0].childNodes[0];
         const offset = parseInt(offSetObj.value);
-        const fileObj = row.cells[1].childNodes[0];
+        const fileObj = row.cells[1].querySelector('input[type=file]');
         const progressBar = row.cells[2].childNodes[0];
+        if (!fileObj) throw new Error("No file selector found for row " + index + "!");
         progressBar.textContent = "0";
         progressBars.push(progressBar);
         row.cells[2].style.display = "initial";
