@@ -8638,6 +8638,8 @@ const $382e02c9bbd5d50b$var$lblConsoleBaudrate = document.getElementById("lblCon
 const $382e02c9bbd5d50b$var$lblConsoleFor = document.getElementById("lblConsoleFor");
 const $382e02c9bbd5d50b$var$lblConnTo = document.getElementById("lblConnTo");
 const $382e02c9bbd5d50b$var$table = document.getElementById("fileTable");
+const initialFileInputs = $382e02c9bbd5d50b$var$table ? $382e02c9bbd5d50b$var$table.querySelectorAll('input[type=file]') : [];
+initialFileInputs.forEach((input)=>input.addEventListener("change", $382e02c9bbd5d50b$var$handleFileSelect, false));
 const $382e02c9bbd5d50b$var$alertDiv = document.getElementById("alertDiv");
 const $382e02c9bbd5d50b$var$flashMode = document.getElementById("flashMode");
 const $382e02c9bbd5d50b$var$flashFreq = document.getElementById("flashFreq");
