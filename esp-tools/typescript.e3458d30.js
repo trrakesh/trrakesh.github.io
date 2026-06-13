@@ -8679,12 +8679,25 @@ $382e02c9bbd5d50b$var$lblFlashSize.style.display = "none";
  */ function $382e02c9bbd5d50b$var$handleFileSelect(evt) {
     const fileInput = evt.target;
     const file = fileInput.files[0];
-    if (!file) return;
+    if (!file) {
+        fileInput.data = null;
+        fileInput._dataPromise = null;
+        return;
+    }
     const reader = new FileReader();
-    reader.onload = (ev)=>{
-        const data = ev.target.result;
-        fileInput.data = data instanceof ArrayBuffer ? new Uint8Array(data) : data;
-    };
+    fileInput.data = null;
+    fileInput._dataPromise = new Promise((resolve, reject)=>{
+        reader.onload = (ev)=>{
+            const data = ev.target.result;
+            fileInput.data = data instanceof ArrayBuffer ? new Uint8Array(data) : data;
+            fileInput._dataPromise = null;
+            resolve(fileInput.data);
+        };
+        reader.onerror = ()=>{
+            fileInput._dataPromise = null;
+            reject(reader.error || new Error("File read failed"));
+        };
+    });
     reader.readAsArrayBuffer(file);
 }
 const $382e02c9bbd5d50b$var$espLoaderTerminal = {
@@ -9062,8 +9075,26 @@ $382e02c9bbd5d50b$var$consoleStopButton.onclick = async ()=>{
     }
     return "success";
 }
+async function $382e02c9bbd5d50b$var$waitForFileInputData() {
+    const promises = [];
+    for (let index = 1; index < $382e02c9bbd5d50b$var$table.rows.length; index++) {
+        const row = $382e02c9bbd5d50b$var$table.rows[index];
+        const fileObj = row.cells[1].querySelector('input[type=file]');
+        if (fileObj && fileObj.files && fileObj.files.length > 0 && fileObj.data == null && fileObj._dataPromise) {
+            promises.push(fileObj._dataPromise);
+        }
+    }
+    if (promises.length > 0) await Promise.all(promises);
+}
 $382e02c9bbd5d50b$var$programButton.onclick = async ()=>{
     const alertMsg = document.getElementById("alertmsg");
+    try {
+        await $382e02c9bbd5d50b$var$waitForFileInputData();
+    } catch (error) {
+        alertMsg.innerHTML = "<strong>File loading failed: " + (error instanceof Error ? error.message : String(error)) + "</strong>";
+        $382e02c9bbd5d50b$var$alertDiv.style.display = "block";
+        return;
+    }
     const err = $382e02c9bbd5d50b$var$validateProgramInputs();
     if (err != "success") {
         alertMsg.innerHTML = "<strong>" + err + "</strong>";
