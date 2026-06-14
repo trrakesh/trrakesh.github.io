@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Web Serial Reader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+
+    <header class="topbar">
+      <div class="brand">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h.01M10 12h.01M14 12h.01"/><path d="M18 10v4"/>
+        </svg>
+        <div>
+          <div class="title">Web Serial Reader</div>
+          <div class="subtitle">Browser-based serial port monitor</div>
+        </div>
+      </div>
+      <div id="statusBadge" class="status-badge">
+        <span id="statusDot" class="dot" aria-hidden="true"></span>
+        <span id="statusText">Disconnected</span>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="card-label">Connection</div>
+      <div class="controls-grid">
+
+        <div class="conn-buttons">
+          <button id="connect" class="primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            Connect
+          </button>
+          <button id="disconnect" class="danger" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Disconnect
+          </button>
+        </div>
+
+        <div class="field">
+          <label for="baudSelect">Baud Rate</label>
+          <select id="baudSelect" aria-label="Baud rate" style="width:130px">
+            <option value="921600">921600</option>
+            <option value="460800">460800</option>
+            <option value="230400">230400</option>
+            <option value="115200" selected>115200</option>
+            <option value="custom">Custom…</option>
+          </select>
+        </div>
+
+        <div class="field" id="baudCustomWrap" style="display:none">
+          <label for="baudCustom">Custom Baud</label>
+          <input id="baudCustom" type="number" min="50" step="1" placeholder="e.g. 57600" style="width:130px">
+        </div>
+
+        <div class="field toggle-field">
+          <label class="switch">
+            <input id="reconnectToggle" type="checkbox" />
+            <span class="slider"></span>
+          </label>
+          <label for="reconnectToggle">Auto-reconnect</label>
+        </div>
+
+      </div>
+
+      <div class="send-row">
+        <div class="field">
+          <label for="sendInput">Send Data</label>
+          <input id="sendInput" placeholder="Type a message…" />
+        </div>
+        <div class="field">
+          <label for="lineEnding">Line Ending</label>
+          <select id="lineEnding" style="width:120px">
+            <option value="">None</option>
+            <option value="\n">LF (\n)</option>
+            <option value="\r\n">CRLF (\r\n)</option>
+          </select>
+        </div>
+        <button id="sendBtn" disabled class="primary" style="align-self:flex-end">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Send
+        </button>
+      </div>
+    </section>
+
+    <section class="card terminal-card">
+      <div class="terminal-toolbar">
+        <div class="terminal-dots">
+          <span class="red"></span>
+          <span class="yellow"></span>
+          <span class="green"></span>
+        </div>
+        <span class="terminal-title">serial output</span>
+        <div class="terminal-actions">
+          <div class="field toggle-field" style="gap:6px">
+            <label class="switch">
+              <input id="autoScroll" type="checkbox" checked />
+              <span class="slider"></span>
+            </label>
+            <label for="autoScroll" style="color:#7fa8cc;font-size:0.75rem">Auto-scroll</label>
+          </div>
+          <button id="clearLog">Clear</button>
+          <button id="copyLog">Copy</button>
+          <button id="downloadLog">Download</button>
+        </div>
+      </div>
+      <pre id="log" class="log" aria-live="polite"></pre>
+    </section>
+
+    <footer class="footer">
+      Requires a Chromium-based browser with Web Serial API support (Chrome, Edge).
+    </footer>
+
+  </main>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
